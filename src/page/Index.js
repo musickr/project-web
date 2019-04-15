@@ -1,6 +1,7 @@
 import React from 'react';
 import Base from '../component/Base';
-import { Collapse, Button } from "antd";
+import Axios from 'axios';
+import { Collapse, Button, Input  } from "antd";
 import E from 'wangeditor';
 
 const Panel = Collapse.Panel;
@@ -14,8 +15,11 @@ class Index extends React.Component{
                 {title:'文章标题',content:'这是我的文章内容'},
             ]
         };
+        this.one = this.one.bind(this);
     }
-
+    one = ()=>{
+        console.log(this.editor.txt.html())
+    };
 
     render() {
         return(
@@ -37,16 +41,23 @@ class Index extends React.Component{
                         );
                     })}
                 </Collapse>
+                <Input placeholder="input "/>
                 <div ref='editorElem' style={{ textAlign: 'left' }} />
-                <Button type="primary" block>提交</Button>
+                <Button type="primary" onClick={this.one} block>提交</Button>
             </Base>
         </React.Fragment>
         )
   }
 
     componentDidMount () {
-        this.initEditor()
+        this.initEditor();
+        Axios.get('http://admin.kbphp.cn/api/article/lists').then((res)=>{
+            this.setState({
+                articleList:res.data
+            });
+        });
     }
+
 
     initEditor () {
         const elem = this.refs.editorElem
@@ -56,30 +67,30 @@ class Index extends React.Component{
         //editor.customConfig.uploadImgServer = utils.url + '/fileclient-management/api/uploadpic'
         // 限制一次最多上传 1 张图片
         editor.customConfig.uploadImgMaxLength = 1
-       /* editor.customConfig.customUploadImg = function (files, insert) {
+        //editor.customConfig.customUploadImg = function (files, insert) {
             // files 是 input 中选中的文件列表
-            console.log(files)
-            if (files[0]) {
-                const formData = new window.FormData()
-                formData.append('file', files[0], 'cover.jpg')
-                fetch(utils.url + '/fileclient-management/api/uploadpic', {
-                    method: 'POST',
-                    body: formData
-                }).then((res) => {
-                    return res.json()
-                }).then((res) => {
-                    const data = res.resultData
-                    if (data) {
-                        // 上传代码返回结果之后，将图片插入到编辑器中
-                        insert(data.resourceUrl)
-                    } else {
-                        console.log(data.msg)
-                    }
-                })
-            } else {
-                message.info('請選擇要上傳的圖片')
-            }
-        }*/
+            /* console.log(files)
+             if (files[0]) {
+                 const formData = new window.FormData()
+                 formData.append('file', files[0], 'cover.jpg')
+                 fetch(utils.url + '/fileclient-management/api/uploadpic', {
+                     method: 'POST',
+                     body: formData
+                 }).then((res) => {
+                     return res.json()
+                 }).then((res) => {
+                     const data = res.resultData
+                     if (data) {
+                         // 上传代码返回结果之后，将图片插入到编辑器中
+                         insert(data.resourceUrl)
+                     } else {
+                         console.log(data.msg)
+                     }
+                 })
+             } else {
+                 message.info('請選擇要上傳的圖片')
+             }
+         }*/
         editor.customConfig.menus = [
             'head', // 标题
             'bold', // 粗体
